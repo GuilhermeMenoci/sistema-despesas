@@ -29,6 +29,9 @@ public class MovimentacaoContaEntity implements Serializable {
 	@Column(name = "ident")
 	private Long id;
 	
+	@Column(name = "descricao")
+	private String descricao;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "tipo_movimentacao")
 	private TipoMovimentacaoEnum tipoMovimentacao;
