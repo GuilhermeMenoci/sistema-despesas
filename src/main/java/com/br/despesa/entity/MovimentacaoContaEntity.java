@@ -17,9 +17,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.Builder;
 
 @Entity
 @Table(name = "movimentacao_conta")
+@Builder
 public class MovimentacaoContaEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
