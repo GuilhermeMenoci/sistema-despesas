@@ -1,4 +1,4 @@
-package com.br.despesa.dto;
+package com.br.despesa.dto.request;
 
 public record ContaRequest(
 		
