@@ -10,4 +10,6 @@ public interface ContaRepository extends JpaRepository<ContaEntity, Long>{
 
 	Optional<ContaEntity> findByNumeroConta(String numeroConta);
 	
+	boolean existsByNumeroConta(String numeroConta);
+	
 }

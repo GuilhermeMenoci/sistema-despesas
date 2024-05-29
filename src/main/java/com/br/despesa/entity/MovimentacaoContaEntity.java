@@ -58,12 +58,12 @@ public class MovimentacaoContaEntity implements Serializable {
 	@JoinColumn(name = "id")
 	private ContaEntity conta;
 	
-	@Column(name = "data_criacao")
-	private ZonedDateTime dataCriacao;
+	@Column(name = "data_movimentacao")
+	private ZonedDateTime dataMovimentacao;
 	
 	@PrePersist
 	public void onCreate() {
-		dataCriacao = ZonedDateTime.now();
+		dataMovimentacao = ZonedDateTime.now();
 	}
 	
 }
