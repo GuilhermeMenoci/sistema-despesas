@@ -31,6 +31,9 @@ public class ContaEntity implements Serializable {
 	@Column(name = "nome_conta")
 	private String nomeConta;
 	
+	@Column(name = "numero_conta")
+	private String numeroConta;
+	
 	@Column(name = "saldo")
 	private BigDecimal saldo;
 	
@@ -46,6 +49,8 @@ public class ContaEntity implements Serializable {
 	@PrePersist
 	public void onCreate() {
 		dataCriacao = ZonedDateTime.now();
+		saldo = BigDecimal.ZERO;
+		dataAtualizacao = ZonedDateTime.now();
 	}
 	
 	@PreUpdate

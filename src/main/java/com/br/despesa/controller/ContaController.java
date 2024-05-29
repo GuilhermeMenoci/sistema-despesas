@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.br.despesa.dto.MovimentacaoRequest;
+import com.br.despesa.dto.ContaRequest;
 import com.br.despesa.service.ContaService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,9 +17,9 @@ public class ContaController {
 
 	private final ContaService contaService;
 	
-	 @PostMapping("/movimentacoes")
-	 public void cadastrarMovimentacoes(@RequestBody MovimentacaoRequest movimentacao) {
-		 contaService.cadastrarMovimentacoes(movimentacao);
+	 @PostMapping()
+	 public void cadastrarConta(@RequestBody ContaRequest contaRequest) {
+		 contaService.cadastrarConta(contaRequest);
 	 }
 	
 }
