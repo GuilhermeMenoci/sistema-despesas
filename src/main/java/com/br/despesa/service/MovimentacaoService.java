@@ -2,7 +2,7 @@ package com.br.despesa.service;
 
 import org.springframework.stereotype.Service;
 
-import com.br.despesa.dto.MovimentacaoRequest;
+import com.br.despesa.dto.request.MovimentacaoRequest;
 import com.br.despesa.entity.ContaEntity;
 import com.br.despesa.entity.MovimentacaoContaEntity;
 import com.br.despesa.repository.ContaRepository;
