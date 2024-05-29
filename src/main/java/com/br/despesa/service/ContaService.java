@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.br.despesa.dto.request.ContaRequest;
 import com.br.despesa.dto.response.ContaResponse;
 import com.br.despesa.entity.ContaEntity;
+import com.br.despesa.factory.ContaResponseFactory;
 import com.br.despesa.repository.ContaRepository;
 
 import jakarta.transaction.Transactional;
@@ -19,6 +20,9 @@ public class ContaService {
 	@Transactional
 	public void cadastrarConta(ContaRequest contaRequest) {
 		
+		if(contaRepository.existsByNumeroConta(contaRequest.numeroConta()))
+			throw new RuntimeException("Já existe um cadastro de uma conta com esse número");
+		
 		ContaEntity conta = ContaEntity.builder()
 		.nomeConta(contaRequest.nomeConta())
 		.numeroConta(contaRequest.numeroConta())
@@ -30,19 +34,7 @@ public class ContaService {
 	
 	public ContaResponse buscarContaPorId(Long id) {
 		ContaEntity conta = buscarConta(id);
-		return converterParaResponse(conta);
-	}
-	
-	private ContaResponse converterParaResponse(ContaEntity conta) {
-		
-		return ContaResponse.builder()
-				.id(conta.getId())
-				.nomeConta(conta.getNomeConta())
-				.numeroConta(conta.getNumeroConta())
-				.saldo(conta.getSaldo())
-				.dataCriacao(conta.getDataCriacao())
-				.build();
-		
+		return ContaResponseFactory.converterReponse(conta);
 	}
 	
 	private ContaEntity buscarConta(Long idConta) {
