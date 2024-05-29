@@ -1,6 +1,7 @@
 package com.br.despesa.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 import com.br.despesa.enuns.TipoDespesaEnum;
@@ -38,6 +39,12 @@ public class MovimentacaoContaEntity implements Serializable {
 	
 	@Column(name = "descricao")
 	private String descricao;
+	
+	@Column(name = "valor_movimentado")
+	private BigDecimal valorMovimentado;
+	
+	@Column(name = "saldo_atual_conta")
+	private BigDecimal saldoAtual;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "tipo_movimentacao")

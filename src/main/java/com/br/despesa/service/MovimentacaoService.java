@@ -1,10 +1,14 @@
 package com.br.despesa.service;
 
+import java.math.BigDecimal;
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 
 import com.br.despesa.dto.request.MovimentacaoRequest;
 import com.br.despesa.entity.ContaEntity;
 import com.br.despesa.entity.MovimentacaoContaEntity;
+import com.br.despesa.enuns.TipoMovimentacaoEnum;
 import com.br.despesa.repository.ContaRepository;
 import com.br.despesa.repository.MovimentacaoContaRepository;
 
@@ -22,12 +26,26 @@ public class MovimentacaoService {
 	@Transactional
 	public void cadastrarMovimentacoes(MovimentacaoRequest movimentacaoRequest) {
 
-		ContaEntity conta = buscarConta(movimentacaoRequest.idConta());
-
+		ContaEntity conta = buscarContaPorNumero(movimentacaoRequest.numeroConta());
+		atualizarSaldoConta(movimentacaoRequest, conta);
+		
 		MovimentacaoContaEntity movimentacao = extrairMovimentacao(movimentacaoRequest, conta);
 		movimentacaoContaRepository.save(movimentacao);
 
+	}
 
+	private void atualizarSaldoConta(MovimentacaoRequest movimentacaoRequest, ContaEntity conta) {
+		BigDecimal saldoNovo;
+		
+		if(Objects.equals(TipoMovimentacaoEnum.MOV_ENTRADA, movimentacaoRequest.tipoMovimentacao())) {
+			saldoNovo =  conta.getSaldo().add(movimentacaoRequest.quantidadeMovimentar());
+			
+		} else {
+			saldoNovo =  conta.getSaldo().subtract(movimentacaoRequest.quantidadeMovimentar());
+		}
+		
+		conta.setSaldo(saldoNovo);
+		contaRepository.save(conta);
 	}
 
 	private MovimentacaoContaEntity extrairMovimentacao(MovimentacaoRequest movimentacaoRequest, ContaEntity conta) {
@@ -36,11 +54,13 @@ public class MovimentacaoService {
 				.descricao(movimentacaoRequest.descricao())
 				.tipoDespesa(movimentacaoRequest.tipoDespesa())
 				.tipoMovimentacao(movimentacaoRequest.tipoMovimentacao())
+				.valorMovimentado(Objects.equals(TipoMovimentacaoEnum.MOV_SAIDA, movimentacaoRequest.tipoMovimentacao()) ? movimentacaoRequest.quantidadeMovimentar().negate() : movimentacaoRequest.quantidadeMovimentar())
+				.saldoAtual(conta.getSaldo())
 				.build();
 	}
 
-	private ContaEntity buscarConta(Long idConta) {
-		return contaRepository.findById(idConta).orElseThrow(() -> new RuntimeException("Nenhuma conta encontrada"));
+	private ContaEntity buscarContaPorNumero(String numeroConta) {
+		return contaRepository.findByNumeroConta(numeroConta).orElseThrow(() -> new RuntimeException("Nenhuma conta encontrada"));
 	}
 
 }
