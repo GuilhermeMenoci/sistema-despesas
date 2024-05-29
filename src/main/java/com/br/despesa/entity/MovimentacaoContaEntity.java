@@ -55,7 +55,7 @@ public class MovimentacaoContaEntity implements Serializable {
 	private TipoDespesaEnum tipoDespesa;
 	
 	@ManyToOne
-	@JoinColumn(name = "id")
+	@JoinColumn(name = "id_conta")
 	private ContaEntity conta;
 	
 	@Column(name = "data_movimentacao")
