@@ -7,7 +7,7 @@ import com.br.despesa.enuns.TipoMovimentacaoEnum;
 
 public record MovimentacaoRequest(
 		
-		Long idConta,
+		String numeroConta,
 		BigDecimal quantidadeMovimentar,
 		String descricao,
 		TipoMovimentacaoEnum tipoMovimentacao,
