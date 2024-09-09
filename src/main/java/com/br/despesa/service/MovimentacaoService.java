@@ -1,14 +1,21 @@
 package com.br.despesa.service;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
+import com.br.despesa.dto.request.FiltroRequstExtrato;
 import com.br.despesa.dto.request.MovimentacaoRequest;
 import com.br.despesa.dto.response.MovimentacaoResponse;
+import com.br.despesa.dto.response.MovimentacoesContaResponse;
 import com.br.despesa.entity.ContaEntity;
 import com.br.despesa.entity.MovimentacaoContaEntity;
+import com.br.despesa.enuns.TipoDespesaEnum;
 import com.br.despesa.enuns.TipoMovimentacaoEnum;
 import com.br.despesa.factory.ContaResponseFactory;
 import com.br.despesa.factory.MovimentacaoResponseFactory;
@@ -47,6 +54,10 @@ public class MovimentacaoService {
 			saldoNovo =  conta.getSaldo().subtract(movimentacaoRequest.quantidadeMovimentar());
 		}
 		
+		if(saldoNovo.compareTo(BigDecimal.ZERO) < 0) {
+			throw new RuntimeException("Seu saldo ficará negativo");
+		}
+		
 		conta.setSaldo(saldoNovo);
 		contaRepository.save(conta);
 	}
@@ -79,6 +90,26 @@ public class MovimentacaoService {
 	
 	private ContaEntity buscarConta(Long idConta) {
 		return contaRepository.findById(idConta).orElseThrow(() -> new RuntimeException("Nenhuma conta encontrada"));
+	}
+
+	public List<TipoMovimentacaoEnum> listarTiposMovimentacoes() {
+		return Arrays.asList(TipoMovimentacaoEnum.values());
+	}
+
+	public List<TipoDespesaEnum> listarTipoDespesas() {
+		return Arrays.asList(TipoDespesaEnum.values());
+	}
+
+	public List<MovimentacoesContaResponse> pesquisarExtratoMovimentacoes(FiltroRequstExtrato filtros) {
+		ZonedDateTime dataInicio = filtros.dataInicio().atStartOfDay(ZoneId.systemDefault());
+		ZonedDateTime dataFim = ZonedDateTime.now().plusDays(1).minusNanos(1);
+		
+		if(Objects.nonNull(filtros.dataFim()))
+			dataFim = filtros.dataFim().plusDays(1).atStartOfDay(ZoneId.systemDefault()).minusNanos(1);
+		
+		
+		List<MovimentacaoContaEntity> extratos = movimentacaoContaRepository.findExtratoMovimentacoes(dataInicio, dataFim);
+		return MovimentacaoResponseFactory.converterParaListaReponse(extratos);
 	}
 
 }
