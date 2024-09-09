@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.br.despesa.dto.request.FiltroRequstExtrato;
 import com.br.despesa.dto.request.MovimentacaoRequest;
 import com.br.despesa.dto.response.MovimentacaoResponse;
+import com.br.despesa.dto.response.MovimentacoesContaResponse;
 import com.br.despesa.enuns.TipoDespesaEnum;
 import com.br.despesa.enuns.TipoMovimentacaoEnum;
 import com.br.despesa.service.MovimentacaoService;
@@ -44,6 +46,11 @@ public class MovimentacaoController {
 	@GetMapping("/tipos-despesas")
 	public List<TipoDespesaEnum> listarTipoDespesas() {
 		return movimentacaoService.listarTipoDespesas();
+	}
+	
+	@GetMapping("/filtros")
+	public List<MovimentacoesContaResponse> pesquisarExtratoMovimentacoes(FiltroRequstExtrato filtros) {
+		return movimentacaoService.pesquisarExtratoMovimentacoes(filtros);
 	}
 	
 }

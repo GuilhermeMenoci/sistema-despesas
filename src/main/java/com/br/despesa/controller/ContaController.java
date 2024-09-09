@@ -17,6 +17,7 @@ import com.br.despesa.dto.request.ContaRequest;
 import com.br.despesa.dto.response.ContaResponse;
 import com.br.despesa.service.ContaService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -28,7 +29,7 @@ public class ContaController {
 	private final ContaService contaService;
 
 	@PostMapping()
-	public void cadastrarConta(@RequestBody ContaRequest contaRequest) {
+	public void cadastrarConta(@Valid @RequestBody ContaRequest contaRequest) {
 		contaService.cadastrarConta(contaRequest);
 	}
 
