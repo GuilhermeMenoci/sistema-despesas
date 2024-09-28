@@ -87,7 +87,7 @@ class ContaControllerTest {
 	}
 	
 	private ContaRequest construirContaRequest() {
-		return new ContaRequest("Guilherme", "12345");
+		return new ContaRequest("Guilherme", "12345", "gmenoci", "123", "teste@teste.com");
 	}
 	
 	private ContaResponse construirContaResponse() {

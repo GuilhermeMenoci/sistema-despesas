@@ -8,7 +8,16 @@ public record ContaRequest(
 		String nomeConta,
 		
 		@NotBlank(message = "Número da conta é um campo obrigatório")
-		String numeroConta
+		String numeroConta,
+		
+		@NotBlank(message = "Usuário é um campo obrigatório")
+		String usuario,
+		
+		@NotBlank(message = "Senha é um campo obrigatório")
+		String senha,
+		
+		@NotBlank(message = "E-mail é um campo obrigatório")
+		String email
 		
 		) {
 

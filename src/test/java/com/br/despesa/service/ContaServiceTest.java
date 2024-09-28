@@ -30,6 +30,7 @@ import com.br.despesa.entity.ContaEntity;
 import com.br.despesa.entity.MovimentacaoContaEntity;
 import com.br.despesa.enuns.TipoMovimentacaoEnum;
 import com.br.despesa.repository.ContaRepository;
+import com.br.despesa.repository.UsuarioRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ContaServiceTest {
@@ -39,6 +40,9 @@ class ContaServiceTest {
 	
 	@Mock
 	private ContaRepository contaRepository;
+	
+	@Mock
+	private UsuarioRepository usuarioRepository;
 	
 	@Test
 	@Order(1)
@@ -159,7 +163,7 @@ class ContaServiceTest {
 	}
 	
 	private ContaRequest construirContaRequest() {
-		return new ContaRequest("Guilherme", "12345");
+		return new ContaRequest("Guilherme", "12345", "gmenoci", "123", "teste@teste.com");
 	}
 	
 }

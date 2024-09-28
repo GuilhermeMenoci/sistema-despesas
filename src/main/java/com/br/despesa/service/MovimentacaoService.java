@@ -17,8 +17,8 @@ import com.br.despesa.entity.ContaEntity;
 import com.br.despesa.entity.MovimentacaoContaEntity;
 import com.br.despesa.enuns.TipoDespesaEnum;
 import com.br.despesa.enuns.TipoMovimentacaoEnum;
-import com.br.despesa.factory.ContaResponseFactory;
-import com.br.despesa.factory.MovimentacaoResponseFactory;
+import com.br.despesa.factory.dto.ContaResponseFactory;
+import com.br.despesa.factory.dto.MovimentacaoResponseFactory;
 import com.br.despesa.repository.ContaRepository;
 import com.br.despesa.repository.MovimentacaoContaRepository;
 
