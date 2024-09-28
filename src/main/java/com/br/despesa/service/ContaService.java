@@ -22,9 +22,13 @@ import com.br.despesa.dto.request.ContaRequest;
 import com.br.despesa.dto.response.ContaResponse;
 import com.br.despesa.entity.ContaEntity;
 import com.br.despesa.entity.MovimentacaoContaEntity;
+import com.br.despesa.entity.UsuarioEntity;
 import com.br.despesa.enuns.TipoMovimentacaoEnum;
-import com.br.despesa.factory.ContaResponseFactory;
+import com.br.despesa.factory.dto.ContaResponseFactory;
+import com.br.despesa.factory.entity.ContaEntityFactory;
+import com.br.despesa.factory.entity.UsuarioEntityFactory;
 import com.br.despesa.repository.ContaRepository;
+import com.br.despesa.repository.UsuarioRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -35,19 +39,31 @@ public class ContaService {
 	
 	private final ContaRepository contaRepository;
 	
+	private final UsuarioRepository usuarioRepository;
+	
 	@Transactional
 	public void cadastrarConta(ContaRequest contaRequest) {
-		
+		UsuarioEntity usuario = extrairUsuario(contaRequest);
+		validarNumeroConta(contaRequest);
+		extrairConta(contaRequest, usuario);
+	}
+
+	private void extrairConta(ContaRequest contaRequest, UsuarioEntity usuario) {
+		ContaEntity conta = ContaEntityFactory.converterParaEntity(contaRequest, usuario);
+		contaRepository.save(conta);
+	}
+
+	private void validarNumeroConta(ContaRequest contaRequest) {
 		if(contaRepository.existsByNumeroConta(contaRequest.numeroConta()))
 			throw new RuntimeException("Já existe um cadastro de uma conta com esse número");
+	}
+
+	private UsuarioEntity extrairUsuario(ContaRequest contaRequest) {
+		if(usuarioRepository.existsByUsuario(contaRequest.usuario()))
+			throw new RuntimeException("Usuário já cadastrado");
 		
-		ContaEntity conta = ContaEntity.builder()
-		.nomeConta(contaRequest.nomeConta())
-		.numeroConta(contaRequest.numeroConta())
-		.build();
-		
-		contaRepository.save(conta);
-		
+		UsuarioEntity usuario = UsuarioEntityFactory.converterParaEntity(contaRequest);
+		return usuarioRepository.save(usuario);
 	}
 	
 	public ContaResponse buscarContaPorId(Long id) {

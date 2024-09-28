@@ -1,4 +1,4 @@
-package com.br.despesa.factory;
+package com.br.despesa.factory.dto;
 
 import java.util.List;
 

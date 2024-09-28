@@ -1,4 +1,4 @@
-package com.br.despesa.factory;
+package com.br.despesa.factory.dto;
 
 import com.br.despesa.dto.response.ContaResponse;
 import com.br.despesa.entity.ContaEntity;
