@@ -1,5 +1,5 @@
 # Usar uma imagem base JDK para execução do JAR
-FROM openjdk:17-alpine
+FROM openjdk:17-slim
 # Definir o diretório de trabalho
 WORKDIR /app
 # Copiar o JAR gerado para o diretório de trabalho no contêiner
