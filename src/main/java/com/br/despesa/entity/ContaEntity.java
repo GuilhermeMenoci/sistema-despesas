@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
@@ -54,6 +55,7 @@ public class ContaEntity implements Serializable {
 	private ZonedDateTime dataAtualizacao;
 	
 	@OneToOne
+	@JoinColumn(name = "id_usuario")
 	private UsuarioEntity usuario;
 	
 	@PrePersist

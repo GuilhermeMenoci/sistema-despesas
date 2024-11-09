@@ -41,7 +41,7 @@ public class UsuarioEntity implements Serializable {
 	
 	@Column(name = "data_atualizacao")
 	private ZonedDateTime dataAtualizacao;
-
+	
 	@PrePersist
 	public void onCreate() {
 		dataAtualizacao = ZonedDateTime.now();
