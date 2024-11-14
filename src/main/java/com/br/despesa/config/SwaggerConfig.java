@@ -11,6 +11,7 @@ import lombok.Generated;
 @Configuration
 public class SwaggerConfig {
 
+	// http://localhost:8080/swagger-ui/index.html
 	@Bean
 	OpenAPI customOpenAPI() {
 		return new OpenAPI()
