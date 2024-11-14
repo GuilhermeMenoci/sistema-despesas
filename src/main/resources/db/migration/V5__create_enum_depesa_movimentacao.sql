@@ -1,8 +1,0 @@
-CREATE TYPE tipo_despesa_enum AS ENUM (
-    'TP_ALIMENTACAO', 'TP_ANIMAIS', 'TP_EDUCACAO', 'TP_INVESTIMENTO', 
-    'TP_LAZER', 'TP_OUTROS', 'TP_SAUDE', 'TP_SEGUROS', 'TP_TRANSPORTE', 'TP_VIAGEM'
-);
-
-CREATE TYPE tipo_movimentacao_enum AS ENUM (
-    'MOV_ENTRADA', 'MOV_SAIDA'
-);

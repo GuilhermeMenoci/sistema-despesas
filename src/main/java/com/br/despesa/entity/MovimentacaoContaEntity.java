@@ -45,7 +45,7 @@ public class MovimentacaoContaEntity implements Serializable {
 	
 	@Column(name = "saldo_atual_conta")
 	private BigDecimal saldoAtual;
-	
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "tipo_movimentacao")
 	private TipoMovimentacaoEnum tipoMovimentacao;
