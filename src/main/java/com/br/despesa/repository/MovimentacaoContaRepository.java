@@ -15,4 +15,11 @@ public interface MovimentacaoContaRepository extends JpaRepository<MovimentacaoC
 		 + "where movimentacoes.dataMovimentacao between :dataInicio and :dataFim")
 	List<MovimentacaoContaEntity> findExtratoMovimentacoes(ZonedDateTime dataInicio, ZonedDateTime dataFim);
 	
+	@Query(" select movimentacoes "
+		 + " from MovimentacaoContaEntity movimentacoes "
+		 + " join movimentacoes.conta conta "
+		 + " where movimentacoes.dataMovimentacao between :dataInicio and :dataFim "
+		 + " and conta.id = :idConta")
+		List<MovimentacaoContaEntity> findExtratoMovimentacoesByNumeroConta(Long idConta, ZonedDateTime dataInicio, ZonedDateTime dataFim);
+	
 }

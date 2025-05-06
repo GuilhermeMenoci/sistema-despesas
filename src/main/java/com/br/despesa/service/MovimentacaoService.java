@@ -7,9 +7,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import com.br.despesa.exception.BusinessException;
+import com.br.despesa.exception.NaoEncontradoException;
 import org.springframework.stereotype.Service;
 
-import com.br.despesa.dto.request.FiltroRequstExtrato;
+import com.br.despesa.dto.request.FiltroRequestExtrato;
 import com.br.despesa.dto.request.MovimentacaoRequest;
 import com.br.despesa.dto.response.MovimentacaoResponse;
 import com.br.despesa.dto.response.MovimentacoesContaResponse;
@@ -55,7 +57,7 @@ public class MovimentacaoService {
 		}
 		
 		if(saldoNovo.compareTo(BigDecimal.ZERO) < 0) {
-			throw new RuntimeException("Seu saldo ficará negativo");
+			throw new BusinessException("Seu saldo ficará negativo");
 		}
 		
 		conta.setSaldo(saldoNovo);
@@ -74,7 +76,7 @@ public class MovimentacaoService {
 	}
 
 	private ContaEntity buscarContaPorNumero(String numeroConta) {
-		return contaRepository.findByNumeroConta(numeroConta).orElseThrow(() -> new RuntimeException("Nenhuma conta encontrada"));
+		return contaRepository.findByNumeroConta(numeroConta).orElseThrow(() -> new NaoEncontradoException("Nenhuma conta encontrada"));
 	}
 
 	public MovimentacaoResponse buscarMovimentacoesConta(Long idConta) {
@@ -89,7 +91,7 @@ public class MovimentacaoService {
 	}
 	
 	private ContaEntity buscarConta(Long idConta) {
-		return contaRepository.findById(idConta).orElseThrow(() -> new RuntimeException("Nenhuma conta encontrada"));
+		return contaRepository.findById(idConta).orElseThrow(() -> new NaoEncontradoException("Nenhuma conta encontrada"));
 	}
 
 	public List<TipoMovimentacaoEnum> listarTiposMovimentacoes() {
@@ -100,16 +102,34 @@ public class MovimentacaoService {
 		return Arrays.asList(TipoDespesaEnum.values());
 	}
 
-	public List<MovimentacoesContaResponse> pesquisarExtratoMovimentacoes(FiltroRequstExtrato filtros) {
-		ZonedDateTime dataInicio = filtros.dataInicio().atStartOfDay(ZoneId.systemDefault());
+	public List<MovimentacoesContaResponse> pesquisarExtratoMovimentacoes(FiltroRequestExtrato filtros) {
+		ZonedDateTime dataInicio = extrairDataInicio(filtros);
+		ZonedDateTime dataFim = extrairDataFim(filtros);
+		
+		
+		List<MovimentacaoContaEntity> extratos = movimentacaoContaRepository.findExtratoMovimentacoesByNumeroConta(filtros.idConta(), dataInicio, dataFim);
+		return MovimentacaoResponseFactory.converterParaListaReponse(extratos);
+	}
+
+	private ZonedDateTime extrairDataInicio(FiltroRequestExtrato filtros) {
+		return filtros.dataInicio().atStartOfDay(ZoneId.systemDefault());
+	}
+	
+	private ZonedDateTime extrairDataFim(FiltroRequestExtrato filtros) {
 		ZonedDateTime dataFim = ZonedDateTime.now().plusDays(1).minusNanos(1);
 		
 		if(Objects.nonNull(filtros.dataFim()))
 			dataFim = filtros.dataFim().plusDays(1).atStartOfDay(ZoneId.systemDefault()).minusNanos(1);
 		
-		
-		List<MovimentacaoContaEntity> extratos = movimentacaoContaRepository.findExtratoMovimentacoes(dataInicio, dataFim);
-		return MovimentacaoResponseFactory.converterParaListaReponse(extratos);
+		return dataFim;
 	}
+	
+	public List<MovimentacaoContaEntity> pesquisarExtratoMovimentacoesEntity(FiltroRequestExtrato filtros) {
+		ZonedDateTime dataInicio = extrairDataInicio(filtros);
+		ZonedDateTime dataFim = extrairDataFim(filtros);
+		
+		return movimentacaoContaRepository.findExtratoMovimentacoesByNumeroConta(filtros.idConta(), dataInicio, dataFim);
+	}
+
 
 }

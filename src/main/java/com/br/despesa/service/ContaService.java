@@ -3,10 +3,17 @@ package com.br.despesa.service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
+import com.br.despesa.exception.BusinessException;
+import com.br.despesa.exception.DadosCadastradosException;
+import com.br.despesa.exception.FiltrosInvalidosException;
+import com.br.despesa.exception.NaoEncontradoException;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -19,6 +26,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import com.br.despesa.dto.request.ContaRequest;
+import com.br.despesa.dto.request.FiltroRequestExtrato;
 import com.br.despesa.dto.response.ContaResponse;
 import com.br.despesa.entity.ContaEntity;
 import com.br.despesa.entity.MovimentacaoContaEntity;
@@ -41,6 +49,9 @@ public class ContaService {
 	
 	private final UsuarioRepository usuarioRepository;
 	
+//	private final MovimentacaoService movimentacaoService;
+	private final MovimentacaoService movimentacaoService;
+	
 	@Transactional
 	public void cadastrarConta(ContaRequest contaRequest) {
 		UsuarioEntity usuario = extrairUsuario(contaRequest);
@@ -55,12 +66,12 @@ public class ContaService {
 
 	private void validarNumeroConta(ContaRequest contaRequest) {
 		if(contaRepository.existsByNumeroConta(contaRequest.numeroConta()))
-			throw new RuntimeException("Já existe um cadastro de uma conta com esse número");
+			throw new DadosCadastradosException("Já existe um cadastro de uma conta com esse número");
 	}
 
 	private UsuarioEntity extrairUsuario(ContaRequest contaRequest) {
 		if(usuarioRepository.existsByUsuario(contaRequest.usuario()))
-			throw new RuntimeException("Usuário já cadastrado");
+			throw new DadosCadastradosException("Usuário já cadastrado");
 		
 		UsuarioEntity usuario = UsuarioEntityFactory.converterParaEntity(contaRequest);
 		return usuarioRepository.save(usuario);
@@ -72,13 +83,17 @@ public class ContaService {
 	}
 	
 	private ContaEntity buscarConta(Long idConta) {
-		return contaRepository.findById(idConta).orElseThrow(() -> new RuntimeException("Nenhuma conta encontrada"));
+		return contaRepository.findById(idConta).orElseThrow(() -> new NaoEncontradoException("Nenhuma conta encontrada"));
 	}
 
-	public Resource gerarXlsDespesas(Long id) {
+	public Resource gerarXlsDespesas(Long id, LocalDate dataInicio, LocalDate dataFim) {
 
-		ContaEntity conta = buscarConta(id);
+		if(Objects.isNull(dataInicio) || Objects.isNull(dataFim))
+			throw new FiltrosInvalidosException("Informe uma data");
 
+		List<MovimentacaoContaEntity> movimentacoes = movimentacaoService.pesquisarExtratoMovimentacoesEntity(new FiltroRequestExtrato(id, dataInicio, dataFim));
+		validarTamanhoExtrato(movimentacoes);
+		
 		Resource r = null;
 
 		HSSFWorkbook workbook = new HSSFWorkbook();
@@ -103,13 +118,23 @@ public class ContaService {
 		numberStyle.setDataFormat(numberFormat.getFormat("#,##0.00"));
 
 		rownum = configurarHeader(sheet, rownum, cellnum, headerStyle);
-		extrairDadosParaPlanilha(conta, sheet, rownum, textStyle, numberStyle);
+		extrairDadosParaPlanilha(movimentacoes, sheet, rownum, textStyle, numberStyle);
 
 		return gerarXls(r, workbook);
 
 	}
 
-	private void extrairDadosParaPlanilha(ContaEntity conta, HSSFSheet sheet, int rownum, CellStyle textStyle,
+	private void validarTamanhoExtrato(List<MovimentacaoContaEntity> movimentacoes) {
+		if(movimentacoes.isEmpty()) {
+			throw new NaoEncontradoException("Não há registros disponíveis");
+		}
+		
+		if(!movimentacoes.isEmpty() && movimentacoes.size() > 1000) {
+			throw new BusinessException("Foram encontrados mais de 1000 registros. Refine sua busca");
+		}
+	}
+
+	private void extrairDadosParaPlanilha(List<MovimentacaoContaEntity> movimentacoes, HSSFSheet sheet, int rownum, CellStyle textStyle,
 			CellStyle numberStyle) {
 		
 		int cellnum;
@@ -119,7 +144,7 @@ public class ContaService {
 		double totalSaida = 0.0d;
 		double totalEntrada = 0.0d;
 		
-		for (MovimentacaoContaEntity movimentacao : conta.getMovimentacoes()) {
+		for (MovimentacaoContaEntity movimentacao : movimentacoes) {
 			row = sheet.createRow(rownum++);
 			cellnum = 0;
 
@@ -146,7 +171,7 @@ public class ContaService {
 			cell = row.createCell(cellnum++);
 			cell.setCellStyle(numberStyle);
 			cell.setCellValue(formatarData(movimentacao.getDataMovimentacao()));
-			
+
 			if(Objects.equals(TipoMovimentacaoEnum.MOV_SAIDA, movimentacao.getTipoMovimentacao())) {
 				totalSaida -= movimentacao.getValorMovimentado().doubleValue();
 			} else {
@@ -168,6 +193,11 @@ public class ContaService {
 	    cell.setCellStyle(numberStyle);
 	    cell.setCellValue(totalEntrada);
 
+	    ContaEntity conta = Optional.ofNullable(movimentacoes)
+	    	    .filter(movs -> !movs.isEmpty())
+	    	    .map(movs -> movs.get(0).getConta())
+	    	    .orElseThrow(() -> new NaoEncontradoException("Nenhuma movimentação encontrada para extrair a conta."));
+	    
 	    // Saldo - Adicionando na primeira linha, coluna 'Valor restante'
 	    cell = row.createCell(8);
 	    cell.setCellStyle(numberStyle);

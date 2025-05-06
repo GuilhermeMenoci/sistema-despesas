@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.br.despesa.dto.request.FiltroRequstExtrato;
+import com.br.despesa.dto.request.FiltroRequestExtrato;
 import com.br.despesa.dto.request.MovimentacaoRequest;
 import com.br.despesa.dto.response.MovimentacaoResponse;
 import com.br.despesa.dto.response.MovimentacoesContaResponse;
@@ -49,7 +49,7 @@ public class MovimentacaoController {
 	}
 	
 	@GetMapping("/filtros")
-	public List<MovimentacoesContaResponse> pesquisarExtratoMovimentacoes(FiltroRequstExtrato filtros) {
+	public List<MovimentacoesContaResponse> pesquisarExtratoMovimentacoes(FiltroRequestExtrato filtros) {
 		return movimentacaoService.pesquisarExtratoMovimentacoes(filtros);
 	}
 	
